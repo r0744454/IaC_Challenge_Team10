@@ -1,0 +1,48 @@
+---
+- name: create_vm
+  hosts: localhost
+  connection: local
+  tasks:
+
+  - name: Create public ip
+    azure_rm_publicipaddress:
+      resource_group: IaCJenkins_group
+      allocation_method: Static
+      name: publicip1
+  - name: create sec group
+    azure_rm_securitygroup:
+      resource_group: IaCJenkins_group
+      name: secgroup1
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+  - name: create NIC
+    azure_rm_networkinterface:
+      resource_group: IaCJenkins_group
+      name: testnic1
+      virtual_network: IaCJenkins_group-vnet
+      subnet: default
+      public_ip_name: publicip1
+      security_group: secgroup1
+      private_ip_address: 10.1.0.5
+      private_ip_allocation_method: Static
+  - name: Create virtual machine
+    azure_rm_virtualmachine:
+      resource_group: IaCJenkins_group
+      name: testvm
+      vm_size: Standard_B1s
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCkSWenX+tx1csQVzlE3b4yI6/46iBGZlskW0jeWZU8pqeOjcuITkVj9vih44x35ujTaSqFUOm/1LZl0pugCIe2+WfLwHdVG7NZofch0wzcx7k2Wf8r79EIcoDlJVH+vEpkB+RHb+SVLl0XsMqkgxSqDQHO9MCMr7FGz/87+o1tAonkN3kHBK3h2zH6aZaysudYG0i04yc6gUEjNX9C6Tln2QuynUyBn/ellHpuFslg/F67hicPnfUKgK2wW26qzGSltwK/Mcf/iaDbuCztNt/h6+mt3bWCEzxk1fbdbQLYvdf8CmqDFja2iq3lGwiyv4mg+4z0fHInnZLCKo9Yacl95+IwI/29sZGgrOfhJFejDsGw/Rgm93wX/SthX3b3PDYcNsMMm9cRhdu/dPhWHNQcA0K81HC/E4GAXRm/CM4vfeWomTOVZHPnULmtByw5fy9Q5TtIHosFs9g8VCXs1sFM/RVS349xdHiEUaQDxcQiCIWdLo4hF0zKhZKnSkBKct0= jenkins@IaCJenkins"
+      network_interfaces: testnic1
+      image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: '18.04-LTS'
+        version: latest

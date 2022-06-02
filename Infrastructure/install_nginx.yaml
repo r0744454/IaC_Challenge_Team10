@@ -1,0 +1,28 @@
+---
+- hosts: testvm
+  tasks:
+    tasks:
+      - name: Add epel-release repo
+        yum:
+          name: epel-release
+          state: present
+  - name: Setting up nginx repository
+    copy:
+      dest: /etc/yum.repos.d/nginx.repo
+      content:
+        [nginx]
+        name=nginx repo
+        baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+        gpgcheck=0
+
+  - name: Install nginx
+    yum:
+      name: nginx
+      state: present
+      enablerepo: nginx
+
+  - name: Start nginx
+    service:
+      name: nginx
+      state: started
+      enable: yes

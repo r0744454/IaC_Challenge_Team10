@@ -1,0 +1,10 @@
+---
+- name: remove web resources
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: remove resource group
+      azure_rm_resourcegroup:
+        name: TestResourceGroup
+        force: yes
+        state: absent

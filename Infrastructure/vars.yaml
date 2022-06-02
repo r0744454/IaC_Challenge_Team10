@@ -1,0 +1,6 @@
+---
+app_user: "azure"
+http_host: "iac-team10.westeurope.cloudapp.azure.com"
+http_conf: "000-default.conf"
+http_port: "80"
+#disable_default: true
